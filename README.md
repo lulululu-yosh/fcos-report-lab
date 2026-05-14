@@ -70,7 +70,35 @@ python -m fcos_report.evaluate --model retinanet --split val2017 --full
 python -m fcos_report.export_testdev --model fcos
 python -m fcos_report.make_figures --all
 python -m fcos_report.demo_images --image-dir samples
+python -m fcos_report.benchmark_runtime --model fcos --split val2017 --limit 200
+python -m fcos_report.analyze_sizes --model fcos --split val2017
+python -m fcos_report.analyze_classes --model fcos --split val2017
+python -m fcos_report.threshold_sweep --model fcos --split val2017
+python -m fcos_report.analyze_crowded_scenes --model fcos --split val2017
+python -m fcos_report.export_case_studies --split val2017
+python -m fcos_report.analyze_fcos_internals --split val2017
+python -m fcos_report.run_analysis --split val2017
 ```
+
+## Experiment Code
+
+Run full inference first so the analysis modules can reuse the same result JSON:
+
+```bash
+python -m fcos_report.evaluate --model fcos --split val2017 --full
+python -m fcos_report.evaluate --model retinanet --split val2017 --full
+python -m fcos_report.run_analysis --split val2017
+```
+
+The analysis modules generate CSVs and case-study images only when executed:
+
+- `analyze_sizes`: small/medium/large GT matching, recall, precision, mean IoU.
+- `analyze_classes`: per-class GT/detection/match stats and optional COCO per-class AP.
+- `threshold_sweep`: score threshold sweep from a low-threshold result JSON.
+- `analyze_crowded_scenes`: dense and overlapped image statistics.
+- `export_case_studies`: FCOS-better, RetinaNet-better, both-good, both-hard, crowded examples.
+- `analyze_fcos_internals`: FCOS head tensor stats and approximate FPN-level detection scale distribution.
+- `benchmark_runtime`: per-image runtime and final output count statistics.
 
 ## Maintenance Notes
 

@@ -11,11 +11,11 @@ models:
   fcos:
     torchvision_name: fcos_resnet50_fpn
     weights: FCOS_ResNet50_FPN_Weights.DEFAULT
-    score_threshold: 0.35
+    score_threshold: 0.05
   retinanet:
     torchvision_name: retinanet_resnet50_fpn
     weights: RetinaNet_ResNet50_FPN_Weights.DEFAULT
-    score_threshold: 0.35
+    score_threshold: 0.05
 
 evaluation:
   batch_size: 1

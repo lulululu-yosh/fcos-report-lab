@@ -1,0 +1,13 @@
+{
+  "image_id": 333697,
+  "file_name": "000000333697.jpg",
+  "case_type": "fcos_better",
+  "gt_count": 1,
+  "fcos_recall": 1.0,
+  "retinanet_recall": 0.0,
+  "recall_delta_fcos_minus_retinanet": 1.0,
+  "fcos_mean_iou": 0.5646565524195023,
+  "retinanet_mean_iou": 0.0,
+  "overlap_pairs_iou_0_3": 0.0,
+  "max_pair_iou": 0.0
+}

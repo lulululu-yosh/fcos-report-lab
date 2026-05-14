@@ -1,0 +1,13 @@
+{
+  "image_id": 208363,
+  "file_name": "000000208363.jpg",
+  "case_type": "crowded_overlap",
+  "gt_count": 32,
+  "fcos_recall": 0.65625,
+  "retinanet_recall": 0.4375,
+  "recall_delta_fcos_minus_retinanet": 0.21875,
+  "fcos_mean_iou": 0.7910400413399717,
+  "retinanet_mean_iou": 0.8188732929845123,
+  "overlap_pairs_iou_0_3": 11.0,
+  "max_pair_iou": 0.6516672948452752
+}

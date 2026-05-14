@@ -1,0 +1,13 @@
+{
+  "image_id": 209753,
+  "file_name": "000000209753.jpg",
+  "case_type": "retinanet_better",
+  "gt_count": 3,
+  "fcos_recall": 0.3333333333333333,
+  "retinanet_recall": 1.0,
+  "recall_delta_fcos_minus_retinanet": -0.6666666666666667,
+  "fcos_mean_iou": 0.8725238876895058,
+  "retinanet_mean_iou": 0.7936947986912702,
+  "overlap_pairs_iou_0_3": 0.0,
+  "max_pair_iou": 0.03227761630515221
+}

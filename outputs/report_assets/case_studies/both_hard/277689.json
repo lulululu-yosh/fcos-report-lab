@@ -1,0 +1,13 @@
+{
+  "image_id": 277689,
+  "file_name": "000000277689.jpg",
+  "case_type": "both_hard",
+  "gt_count": 22,
+  "fcos_recall": 0.2727272727272727,
+  "retinanet_recall": 0.18181818181818182,
+  "recall_delta_fcos_minus_retinanet": 0.09090909090909088,
+  "fcos_mean_iou": 0.7460646806449255,
+  "retinanet_mean_iou": 0.7340867258661538,
+  "overlap_pairs_iou_0_3": 9.0,
+  "max_pair_iou": 0.9705894497526899
+}

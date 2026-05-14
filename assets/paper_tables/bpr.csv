@@ -1,0 +1,6 @@
+method,with_fpn,matching_rule,bpr
+RetinaNet,true,None,86.82
+RetinaNet,true,IoU >= 0.4,90.92
+RetinaNet,true,All,99.23
+FCOS,false,-,95.55
+FCOS,true,-,98.40

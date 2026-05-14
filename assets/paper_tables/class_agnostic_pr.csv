@@ -1,0 +1,4 @@
+method,ap,ap50,ap75,ap90
+Original RetinaNet,39.5,63.6,41.8,10.6
+RetinaNet w/ GN,40.0,64.5,42.2,10.4
+FCOS,40.5,64.7,42.6,13.1

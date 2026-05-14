@@ -1,0 +1,4 @@
+method,samples,ar100,ar1k
+RPN w/ FPN & GN,200000,44.7,56.9
+FCOS w/ GN w/o center-ness,66000,48.0,59.3
+FCOS w/ GN,66000,52.8,60.3

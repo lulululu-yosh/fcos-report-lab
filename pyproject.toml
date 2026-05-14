@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fcos-report-lab"
+version = "0.1.0"
+description = "FCOS report experiments, COCO evaluation helpers, and visualization assets for presentation."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "torch>=2.3",
+  "torchvision>=0.18",
+  "pycocotools>=2.0.7",
+  "matplotlib>=3.8",
+  "pandas>=2.0",
+  "Pillow>=10.0",
+  "PyYAML>=6.0",
+  "requests>=2.31",
+  "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.5"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\caption{Score threshold sweep on COCO val2017.}
+\label{tab:threshold-sweep}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & Thr. & Det./img & Prec. & Rec. & mIoU \\
+\midrule
+FCOS & 0.05 & 100.00 & 6.06 & 82.60 & 80.62 \\
+FCOS & 0.30 & 26.51 & 21.36 & 77.80 & 81.22 \\
+FCOS & 0.50 & 6.33 & 67.00 & 58.28 & 83.88 \\
+FCOS & 0.70 & 2.04 & 94.54 & 26.58 & 88.36 \\
+RetinaNet & 0.05 & 75.10 & 7.81 & 80.39 & 79.44 \\
+RetinaNet & 0.30 & 9.83 & 47.16 & 63.75 & 81.56 \\
+RetinaNet & 0.50 & 4.37 & 78.33 & 47.02 & 84.06 \\
+RetinaNet & 0.70 & 2.39 & 92.89 & 30.58 & 86.69 \\
+\bottomrule
+\end{tabular}
+\end{table}

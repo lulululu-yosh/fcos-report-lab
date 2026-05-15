@@ -100,6 +100,14 @@ The analysis modules generate CSVs and case-study images only when executed:
 - `analyze_fcos_internals`: FCOS head tensor stats and approximate FPN-level detection scale distribution.
 - `benchmark_runtime`: per-image runtime and final output count statistics.
 
+Generate publication-quality figures and LaTeX tables after the analyses finish:
+
+```bash
+python -m fcos_report.publication_assets
+```
+
+This writes vector figures to `outputs/publication_figures/` and booktabs-style tables to `outputs/latex_tables/`.
+
 ## Maintenance Notes
 
 - Do not commit COCO images, annotations, pretrained weights, or generated outputs.

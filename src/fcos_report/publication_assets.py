@@ -375,6 +375,94 @@ def make_latex_bundle(paths: dict[str, Path], table_paths: list[Path]) -> Path:
     return bundle
 
 
+def has_transfer_outputs(paths: dict[str, Path]) -> bool:
+    return (paths["tables"] / "transfer_summary.csv").exists()
+
+
+def transfer_summary_for_plot(paths: dict[str, Path]) -> pd.DataFrame:
+    df = pd.read_csv(paths["tables"] / "transfer_summary.csv")
+    df = df[df["model"].isin(["fcos", "retinanet"])].copy()
+    df["Model"] = df["model"].map({"fcos": "FCOS", "retinanet": "RetinaNet"})
+    df["Dataset"] = df["dataset"].map({"voc": "PASCAL VOC", "visdrone": "VisDrone"}).fillna(df["dataset"])
+    df["Run"] = df.apply(lambda row: f"{row['Dataset']}\nlimit={int(row['limit'])}" if not pd.isna(row["limit"]) and str(row["limit"]) not in {"", "nan"} else row["Dataset"], axis=1)
+    return df
+
+
+def make_transfer_metric_figure(paths: dict[str, Path], metric: str, stem: str, ylabel: str, title: str) -> list[Path]:
+    df = transfer_summary_for_plot(paths)
+    pivot = df.pivot_table(index="Run", columns="Model", values=metric, aggfunc="first")
+    order = list(pivot.index)
+    x = np.arange(len(order))
+    width = 0.36
+    fig, ax = plt.subplots(figsize=(5.8, 3.3))
+    if "RetinaNet" in pivot:
+        ax.bar(x - width / 2, pivot["RetinaNet"] * 100, width, label="RetinaNet", color=COLORS["retinanet"])
+    if "FCOS" in pivot:
+        ax.bar(x + width / 2, pivot["FCOS"] * 100, width, label="FCOS", color=COLORS["fcos"])
+    if {"FCOS", "RetinaNet"}.issubset(pivot.columns):
+        for i, name in enumerate(order):
+            delta = (pivot.loc[name, "FCOS"] - pivot.loc[name, "RetinaNet"]) * 100
+            y = max(pivot.loc[name, "FCOS"], pivot.loc[name, "RetinaNet"]) * 100 + 1.0
+            ax.text(i, y, f"{delta:+.1f}", ha="center", va="bottom", fontsize=8, color=COLORS["delta_pos"] if delta >= 0 else COLORS["delta_neg"])
+    ax.set_xticks(x, order)
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.set_ylim(0, max(5, float((pivot.max().max() or 0) * 100) + 8))
+    ax.legend(frameon=False, ncols=2, loc="upper left")
+    fig.tight_layout()
+    return save_figure(fig, stem, paths["publication_figures"])
+
+
+def make_transfer_per_class_delta(paths: dict[str, Path], dataset: str, top_k: int = 8) -> list[Path]:
+    delta_path = paths["tables"] / "transfer_delta.csv"
+    if not delta_path.exists():
+        return []
+    df = pd.read_csv(delta_path)
+    df = df[df["dataset"].eq(dataset)].copy()
+    if df.empty:
+        return []
+    selected = pd.concat([df.nlargest(top_k, "ap50_delta"), df.nsmallest(top_k, "ap50_delta")]).drop_duplicates("class_name").sort_values("ap50_delta")
+    fig, ax = plt.subplots(figsize=(6.4, max(2.8, 0.34 * len(selected))))
+    y = np.arange(len(selected))
+    colors = [COLORS["delta_pos"] if value >= 0 else COLORS["delta_neg"] for value in selected["ap50_delta"]]
+    ax.barh(y, selected["ap50_delta"] * 100, color=colors)
+    ax.axvline(0, color=COLORS["neutral"], linewidth=0.8)
+    ax.set_yticks(y, selected["class_name"])
+    ax.set_xlabel(r"$\Delta$ AP50 (FCOS - RetinaNet, percentage points)")
+    title = "PASCAL VOC" if dataset == "voc" else "VisDrone"
+    ax.set_title(f"{title}: per-class transfer AP50 delta")
+    fig.tight_layout()
+    return save_figure(fig, f"transfer_per_class_delta_top_bottom_{dataset}", paths["publication_figures"])
+
+
+def make_transfer_tables(paths: dict[str, Path]) -> list[Path]:
+    if not has_transfer_outputs(paths):
+        return []
+    summary = transfer_summary_for_plot(paths)
+    table = summary[["Dataset", "split", "limit", "Model", "num_images", "mapped_classes", "ap50", "recall50", "precision50", "mean_iou_matched", "transfer_retention"]].copy()
+    table.columns = ["Dataset", "Split", "Limit", "Model", "Images", "Classes", "AP50", "Recall50", "Precision50", "mIoU", "Retention"]
+    for col in ["AP50", "Recall50", "Precision50", "mIoU", "Retention"]:
+        table[col] = table[col] * 100
+    table["Limit"] = table["Limit"].fillna("").replace("nan", "")
+    paths_out = [
+        write_booktabs_table(table, paths["latex_tables"] / "transfer_summary.tex", "Cross-dataset transfer evaluation without fine-tuning. Retention is approximate target AP50 divided by overall COCO val2017 AP50.", "tab:transfer-summary", "lllrrrrrrrr"),
+    ]
+    return paths_out
+
+
+def make_transfer_assets(paths: dict[str, Path]) -> list[Path]:
+    if not has_transfer_outputs(paths):
+        return []
+    written: list[Path] = []
+    written.extend(make_transfer_tables(paths))
+    written.extend(make_transfer_metric_figure(paths, "ap50", "transfer_ap50_comparison", "AP50 (%)", "Cross-dataset transfer AP50"))
+    written.extend(make_transfer_metric_figure(paths, "recall50", "transfer_recall_comparison", "Recall@0.50 (%)", "Cross-dataset transfer recall"))
+    written.extend(make_transfer_metric_figure(paths, "transfer_retention", "transfer_retention_comparison", "Retention (%)", "Approximate transfer retention"))
+    written.extend(make_transfer_per_class_delta(paths, "voc"))
+    written.extend(make_transfer_per_class_delta(paths, "visdrone"))
+    return written
+
+
 def generate_publication_assets(config_path: str | Path = "configs/default.yaml") -> list[Path]:
     set_publication_style()
     paths = publication_dirs(config_path)
@@ -399,6 +487,7 @@ def generate_publication_assets(config_path: str | Path = "configs/default.yaml"
     contact = make_case_contact_sheet(paths)
     if contact:
         written.append(contact)
+    written.extend(make_transfer_assets(paths))
     manifest = paths["root"] / "publication_assets_manifest.md"
     manifest.write_text(
         dedent(

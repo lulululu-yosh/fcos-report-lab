@@ -78,6 +78,10 @@ python -m fcos_report.analyze_crowded_scenes --model fcos --split val2017
 python -m fcos_report.export_case_studies --split val2017
 python -m fcos_report.analyze_fcos_internals --split val2017
 python -m fcos_report.run_analysis --split val2017
+python -m fcos_report.evaluate_transfer --dataset voc --split val --model fcos --download
+python -m fcos_report.evaluate_transfer --dataset voc --split val --model retinanet
+python -m fcos_report.evaluate_transfer --dataset visdrone --split val --model fcos --limit 1000
+python -m fcos_report.evaluate_transfer --dataset visdrone --split val --model retinanet --limit 1000
 ```
 
 ## Experiment Code
@@ -107,6 +111,34 @@ python -m fcos_report.publication_assets
 ```
 
 This writes vector figures to `outputs/publication_figures/` and booktabs-style tables to `outputs/latex_tables/`.
+
+## Cross-dataset Transfer Evaluation
+
+This experiment uses COCO-pretrained FCOS and RetinaNet without fine-tuning. It evaluates only target-dataset classes that can be mapped to COCO categories. The goal is not to claim universal transfer superiority, but to compare degradation patterns under direct transfer.
+
+PASCAL VOC:
+
+```bash
+python -m fcos_report.evaluate_transfer --dataset voc --split val --model fcos --download
+python -m fcos_report.evaluate_transfer --dataset voc --split val --model retinanet
+```
+
+VisDrone:
+
+```bash
+python -m fcos_report.evaluate_transfer --dataset visdrone --split val --model fcos --limit 1000
+python -m fcos_report.evaluate_transfer --dataset visdrone --split val --model retinanet --limit 1000
+```
+
+VisDrone is not downloaded automatically. Place it under `data/VisDrone/VisDrone2019-DET-val/images` and `data/VisDrone/VisDrone2019-DET-val/annotations`.
+
+The transfer module reports AP50 with continuous PR integration, Recall@0.50, Precision@0.50, mean IoU of matched boxes, false positives/negatives, per-class AP50, and approximate transfer retention:
+
+```text
+retention = target AP50 / source COCO val2017 AP50
+```
+
+The source baseline uses the overall COCO val2017 AP50 already produced by this project, so retention is approximate rather than class-mapped COCO retention.
 
 ## Maintenance Notes
 
